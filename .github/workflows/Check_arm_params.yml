@@ -1,0 +1,33 @@
+name: Validate ARM Template
+
+on:
+  # Triggers the workflow on push or pull request to the main branch
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate-template:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Log in to Azure using a Service Principal
+      - name: Log in to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Step 3: Validate ARM Template Syntax using Azure CLI
+      - name: Validate ARM Template Syntax
+        run: |
+          az deployment group validate \
+            --resource-group <resource-group> \
+            --template-file ./path-to-your-arm-template/azuredeploy.json \
+            --parameters @./path-to-your-parameters-file/azuredeploy.parameters.json
