@@ -29,6 +29,12 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      - name: Az login
+        uses: azure/cli@v2
+        with:
+          azcliversion: latest
+          inlinescript: az login
+
       # Step 3: Validate ARM Template Syntax using Azure CLI
       - name: Validate ARM Template Syntax
         run: |
