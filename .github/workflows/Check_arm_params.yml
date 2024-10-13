@@ -39,6 +39,6 @@ jobs:
       - name: Validate ARM Template Syntax
         run: |
           az deployment group validate \
-            --resource-group <resource-group> \
+            --resource-group DefaultResourceGroup-EUS \
             --template-file ./Azure_ARM_Template \
             --parameters @./Azure_ARM_Template.parameters
