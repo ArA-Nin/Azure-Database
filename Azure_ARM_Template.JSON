@@ -22,137 +22,148 @@
         }
     },
     "resources": [
-        {
-            "type": "Microsoft.Network/virtualNetworks",
-            "apiVersion": "2021-02-01",
-            "name": "myVnet",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "addressSpace": {
-                    "addressPrefixes": ["10.0.0.0/16"]
-                },
-                "subnets": [
-                    {
-                        "name": "mySubnet",
-                        "properties": {
-                            "addressPrefix": "10.0.0.0/24"
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "type": "Microsoft.Network/networkInterfaces",
-            "apiVersion": "2021-02-01",
-            "name": "myNic",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "ipConfigurations": [
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "subnet": {
-                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'myVnet', 'mySubnet')]"
-                            },
-                            "privateIPAllocationMethod": "Dynamic",
-                            "publicIPAddress": {
-                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'myPublicIP')]"
-                            }
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines",
-            "apiVersion": "2021-07-01",
-            "name": "myUbuntuVM",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "hardwareProfile": {
-                    "vmSize": "Standard_B1s"
-                },
-                "osProfile": {
-                    "computerName": "myUbuntuVM",
-                    "adminUsername": "[parameters('adminUsername')]",
-                    "adminPassword": "[parameters('adminPassword')]",
-                    "linuxConfiguration": {
-                        "disablePasswordAuthentication": false
-                    }
-                },
-                "storageProfile": {
-                    "imageReference": {
-                        "publisher": "Canonical",
-                        "offer": "UbuntuServer",
-                        "sku": "18.04-LTS",
-                        "version": "latest"
-                    },
-                    "osDisk": {
-                        "createOption": "FromImage"
-                    }
-                },
-                "networkProfile": {
-                    "networkInterfaces": [
-                        {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', 'myNic')]"
-                        }
-                    ]
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Network/publicIPAddresses",
-            "apiVersion": "2021-02-01",
-            "name": "myPublicIP",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "publicIPAllocationMethod": "Dynamic"
-            }
-        },
-        {
-            "type": "Microsoft.Sql/servers",
-            "apiVersion": "2021-05-01-preview",
-            "name": "mySqlServer",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "administratorLogin": "sqladmin",
-                "administratorLoginPassword": "[parameters('sqlAdministratorPassword')]",
-                "version": "12.0"
+    {
+        "type": "Microsoft.Network/virtualNetworks",
+        "apiVersion": "2021-02-01",
+        "name": "myVnet",
+        "location": "[resourceGroup().location]",
+        "properties": {
+            "addressSpace": {
+                "addressPrefixes": ["10.0.0.0/16"]
             },
-            "resources": [
+            "subnets": [
                 {
-                    "type": "databases",
-                    "apiVersion": "2021-05-01-preview",
-                    "name": "dvdStoreDB",
+                    "name": "mySubnet",
                     "properties": {
-                        "collation": "SQL_Latin1_General_CP1_CI_AS",
-                        "maxSizeBytes": 2147483648,
-                        "sampleName": "AdventureWorksLT"
+                        "addressPrefix": "10.0.0.0/24"
                     }
                 }
             ]
-        },
-        {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2021-07-01",
-            "name": "[concat('myUbuntuVM', '/', 'installNginx')]",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', 'myUbuntuVM')]"
-            ],
-            "properties": {
-                "publisher": "Microsoft.Azure.Extensions",
-                "type": "CustomScript",
-                "typeHandlerVersion": "2.1",
-                "settings": {
-                    "fileUris": [
-                        "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/application-workloads/nginx/nginx-on-ubuntu/azuredeploy.sh"
-                    ],
-                    "commandToExecute": "bash azuredeploy.sh"
+        }
+    },
+    {
+        "type": "Microsoft.Network/publicIPAddresses",
+        "apiVersion": "2021-02-01",
+        "name": "myPublicIP",
+        "location": "[resourceGroup().location]",
+        "properties": {
+            "publicIPAllocationMethod": "Dynamic"
+        }
+    },
+    {
+        "type": "Microsoft.Network/networkInterfaces",
+        "apiVersion": "2021-02-01",
+        "name": "myNic",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+            "[resourceId('Microsoft.Network/virtualNetworks', 'myVnet')]",
+            "[resourceId('Microsoft.Network/publicIPAddresses', 'myPublicIP')]"
+        ],
+        "properties": {
+            "ipConfigurations": [
+                {
+                    "name": "ipconfig1",
+                    "properties": {
+                        "subnet": {
+                            "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', 'myVnet', 'mySubnet')]"
+                        },
+                        "privateIPAllocationMethod": "Dynamic",
+                        "publicIPAddress": {
+                            "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'myPublicIP')]"
+                        }
+                    }
                 }
+            ]
+        }
+    },
+    {
+        "type": "Microsoft.Compute/virtualMachines",
+        "apiVersion": "2021-07-01",
+        "name": "myUbuntuVM",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+            "[resourceId('Microsoft.Network/networkInterfaces', 'myNic')]"
+        ],
+        "properties": {
+            "hardwareProfile": {
+                "vmSize": "Standard_B1s"
+            },
+            "osProfile": {
+                "computerName": "myUbuntuVM",
+                "adminUsername": "[parameters('adminUsername')]",
+                "adminPassword": "[parameters('adminPassword')]",
+                "linuxConfiguration": {
+                    "disablePasswordAuthentication": false
+                }
+            },
+            "storageProfile": {
+                "imageReference": {
+                    "publisher": "Canonical",
+                    "offer": "UbuntuServer",
+                    "sku": "18.04-LTS",
+                    "version": "latest"
+                },
+                "osDisk": {
+                    "createOption": "FromImage"
+                }
+            },
+            "networkProfile": {
+                "networkInterfaces": [
+                    {
+                        "id": "[resourceId('Microsoft.Network/networkInterfaces', 'myNic')]"
+                    }
+                ]
             }
         }
-    ],
+    },
+    {
+        "type": "Microsoft.Sql/servers",
+        "apiVersion": "2021-05-01-preview",
+        "name": "mySqlServer",
+        "location": "[resourceGroup().location]",
+        "properties": {
+            "administratorLogin": "sqladmin",
+            "administratorLoginPassword": "[parameters('sqlAdministratorPassword')]",
+            "version": "12.0"
+        },
+        "resources": [
+            {
+                "type": "databases",
+                "apiVersion": "2021-05-01-preview",
+                "name": "dvdStoreDB",
+                "dependsOn": [
+                    "[resourceId('Microsoft.Sql/servers', 'mySqlServer')]"
+                ],
+                "properties": {
+                    "collation": "SQL_Latin1_General_CP1_CI_AS",
+                    "maxSizeBytes": 2147483648,
+                    "sampleName": "AdventureWorksLT"
+                }
+            }
+        ]
+    },
+    {
+        "type": "Microsoft.Compute/virtualMachines/extensions",
+        "apiVersion": "2021-07-01",
+        "name": "[concat('myUbuntuVM', '/', 'installNginx')]",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+            "[resourceId('Microsoft.Compute/virtualMachines', 'myUbuntuVM')]"
+        ],
+        "properties": {
+            "publisher": "Microsoft.Azure.Extensions",
+            "type": "CustomScript",
+            "typeHandlerVersion": "2.1",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+                "fileUris": [
+                    "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/application-workloads/nginx/nginx-on-ubuntu/azuredeploy.sh"
+                ],
+                "commandToExecute": "bash azuredeploy.sh"
+            }
+        }
+    }
+],
     "outputs": {
         "websiteURL": {
             "type": "string",
