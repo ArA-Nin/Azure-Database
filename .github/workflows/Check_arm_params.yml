@@ -6,43 +6,43 @@ on:
       - main
   workflow_dispatch:
 
-
 permissions:
   id-token: write
-  contents: read # or write, as needed by other parts of your workflow
-  
+  contents: read
+
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
-     
+    runs-on: ubuntu-latest  # Fixed indentation
 
     steps:
       # Step 1: Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v4
-        with: 
-          fetch-depth: 0
-      - name: Run your action
+      
+      # Step 2: BridgeCrew Yor action (optional - remove if not needed)
+      - name: Run BridgeCrew Yor
         uses: bridgecrewio/yor-action@main
 
-      # Step 2: Log in to Azure using a Service Principal
+      # Step 3: Log in to Azure using Service Principal
       - name: Log in to Azure
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
 
-      - name: Az login
-        uses: azure/cli@v2
-        with:
-          azcliversion: latest
-          inlinescript: az login
-
-      # Step 3: Validate ARM Template Syntax using Azure CLI
+      # Step 4: Validate ARM Template Syntax
       - name: Validate ARM Template Syntax
         run: |
+          # First, check if your template files exist
+          echo "Listing files in current directory:"
+          ls -la
+          
+          # Make sure you have the correct file extensions
+          # ARM templates should be .json files
+          # If your template is in a subdirectory, adjust the path
           az deployment group validate \
             --resource-group DefaultResourceGroup-EUS \
-            --template-file ./Azure_ARM_Template \
-            --parameters @./Azure_ARM_Template.parameters
+            --template-file ./Azure_ARM_Template.json \  # Changed to .json
+            --parameters @./Azure_ARM_Template.parameters.json  # Changed to .json
