@@ -135,7 +135,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2021-07-01",
-            "name": "[concat('installNginx-', 'myUbuntuVM')]",
+            "name": "[concat('myUbuntuVM', '/', 'installNginx')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', 'myUbuntuVM')]"
