@@ -42,7 +42,7 @@ jobs:
           ls -la
           
           # If your files have different names, update these paths
-          TEMPLATE_FILE="Azure_ARM_Template.json"
+          TEMPLATE_FILE="Azure_ARM_Template.JSON"
           PARAMETERS_FILE="Azure_ARM_Template.parameters.json"
           
           # Check if files exist
