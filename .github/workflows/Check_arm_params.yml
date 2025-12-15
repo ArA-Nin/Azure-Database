@@ -6,6 +6,11 @@ on:
       - main
   workflow_dispatch:
 
+
+permissions:
+  id-token: write
+  contents: read # or write, as needed by other parts of your workflow
+  
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
